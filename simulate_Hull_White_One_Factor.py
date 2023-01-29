@@ -42,7 +42,7 @@ def simulate_Hull_White_One_Factor(r0 , alpha, sigma, t, f):
     e = np.zeros(N)
     v = np.zeros(N)
     r = np.ones(N) * r0
-    beta = f + np.power(sigma, 2)/(2*alpha)
+    beta = f + np.power(sigma, 2)/(2*np.power(alpha,2))*np.power((1-np.exp(-alpha*t)),2)
     for el in range(1, N):
         e[el] = r[el-1] * np.exp(-alpha*(t[el] - t[el-1])) + beta[el] - beta[el-1] * np.exp(-alpha*(t[el] - t[el - 1]))
         v[el] = np.power(sigma, 2)/(2*alpha) * (1- np.exp(-2*alpha*(t[el] - t[el - 1])))
