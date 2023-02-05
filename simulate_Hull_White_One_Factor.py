@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
 
-def simulate_Hull_White_One_Factor(r0 , alpha, sigma, t, f):
+def simulate_Hull_White_One_Factor(r0 , a, sigma, t, f):
     # SIMULATE_HULL_WHITE_ONE_FACTOR simulates a temporal series of interest rates using the One Factor Hull-White model
     # Form of the model is dr_{t} = [theta[t] - alpha * r_{t-1}] dt + sigma * dW_{t} 
     # interest_rate_simulation = simulate_Hull_White_One_Factor(r0, alpha, sigma, t, f)
     #
     # Arguments:
     #   r0    = float, starting interest rate of the Hull White process 
-    #   alpha = float, speed of reversion parameter that is related to the velocity at which such trajectories will regroup around the forward rate theta
+    #   a = float, speed of reversion parameter that is related to the velocity at which such trajectories will regroup around the forward rate theta
     #   sigma = float, instantaneous volatility measures instant by instant the amplitude of randomness entering the system
     #   t     = array of floats representing times at which the output is generated. 
     #   f     = array of floats, representing the instantaneous forward rates at times from input t.
@@ -23,8 +23,8 @@ def simulate_Hull_White_One_Factor(r0 , alpha, sigma, t, f):
     #   import pandas as pd
     #   import numpy as np
     #
-    #   simulate_Hull_White_One_Factor(0.02, 0.04, 0.2, np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array([0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03]))   
-    #   [out] = Time    Interest Rate
+    #   simulate_Hull_White_One_Factor(0.02, 0.04, 0.2, np.array([1,2,3,4,5,6,7,8,9,10]), np.array([0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03]))   
+    #   [out] = Time    Interest Rate                
     #           1 	0.020000
     #           2 	0.168049
     #           3 	0.265637
@@ -35,17 +35,17 @@ def simulate_Hull_White_One_Factor(r0 , alpha, sigma, t, f):
     #           8 	0.414285
     #           9 	0.186548
     #           10 	0.354167
-    #
     # For more information see https://en.wikipedia.org/wiki/Hull-White_model
         
     N = t.shape[0]
     e = np.zeros(N)
     v = np.zeros(N)
     r = np.ones(N) * r0
-    beta = f + np.power(sigma, 2)/(2*np.power(alpha,2))*np.power((1-np.exp(-alpha*t)),2)
+    alpha = f + sigma**2/(2*a**2)*(1-np.exp(-a*t))**2
     for el in range(1, N):
-        e[el] = r[el-1] * np.exp(-alpha*(t[el] - t[el-1])) + beta[el] - beta[el-1] * np.exp(-alpha*(t[el] - t[el - 1]))
-        v[el] = np.power(sigma, 2)/(2*alpha) * (1- np.exp(-2*alpha*(t[el] - t[el - 1])))
+        deltat = t[el] - t[el-1]
+        e[el] = r[el-1] * np.exp(-a*deltat) + alpha[el] - alpha[el-1] * np.exp(-a*deltat)
+        v[el] = sigma**2/(2*a) * (1 - np.exp(-2*a*deltat))
         r[el] = np.random.normal(e[el], np.sqrt(v[el]))
         dict = {'Time' : t, 'Interest Rate' : r}
 
